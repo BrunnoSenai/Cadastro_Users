@@ -1,19 +1,34 @@
-import {use, useEffect} from 'react'
+import { useEffect, useRef, useState} from 'react'
 import './style.css'
 import Trash from '../../assets/lixeira.png'
 import api from '../../services/api'
 
 function Home() {
 
-  let users = []
+  const [users, setUsers] = useState([])
+
+  const inputName = useRef()
+  const inputEmail = useRef()
+  const inputAge = useRef()
 
   async function getUsers() {
-    users = await api.get('/users')
+    const usersFromApi = await api.get('/users')
+
+    setUsers(usersFromApi.data)
   }
+
+  async function createUsers() {
+    await api.post('/users', {
+      name: inputName.current.value,
+      email: inputEmail.current.value,
+      age: inputAge.current.value
+    })
+    getUsers()
+  }
+
 useEffect(() => {
   getUsers()
 }, [])
-  console.log(users)
 
 
   return (
@@ -21,9 +36,9 @@ useEffect(() => {
     <div className='container'>
       <form>
         <h1>Cadastro de Usuários</h1>
-        <input name='name' type="text" placeholder='Enter your name' />
-        <input name='email' type="email" placeholder='Enter your email' />
-        <input name='age' type="number" placeholder='Enter your age' />
+        <input name='name' type="text" placeholder='Enter your name' ref={inputName} />
+        <input name='email' type="email" placeholder='Enter your email' ref={inputEmail} />
+        <input name='age' type="number" placeholder='Enter your age' ref={inputAge} />
         <button type="button" className='button'>Cadastrar</button>
       </form>
 
